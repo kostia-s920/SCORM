@@ -103,8 +103,11 @@
                 try {
                     const base64Content = e.target.result.split(',')[1];
 
+                    // Вивід шляху для діагностики
+                    console.log('Sending to:', 'api/convert');
+
                     // Відправляємо запит на сервер
-                    const response = await fetch('/api/convert', {
+                    const response = await fetch('api/convert', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
