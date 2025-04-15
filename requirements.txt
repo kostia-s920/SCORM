@@ -1,3 +1,2 @@
 beautifulsoup4==4.10.0
-PyMuPDF==1.19.0
-lxml==4.6.3
+bs4==0.0.1
