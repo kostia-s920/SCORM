@@ -19,7 +19,7 @@ import sys
 
 def convert_html_to_scorm(html_path, output_path=None, title=None, scorm_version='2004', include_resources=True):
     """
-    Конвертує HTML-файл та пов'язані ресурси у SCORM-пакет
+    Конвертує HTML-файл та по в'язані ресурси у SCORM-пакет
 
     Args:
         html_path (str): Шлях до HTML-файлу
