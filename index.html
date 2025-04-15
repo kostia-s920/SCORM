@@ -138,116 +138,124 @@
         }
 
         async function convertFile() {
-            const fileInput = document.getElementById('file-input');
-            const titleInput = document.getElementById('title-input');
-            const scormVersion = document.getElementById('scorm-version').value;
-            const convertButton = document.getElementById('convert-button');
+    const fileInput = document.getElementById('file-input');
+    const titleInput = document.getElementById('title-input');
+    const scormVersion = document.getElementById('scorm-version').value;
+    const convertButton = document.getElementById('convert-button');
 
-            // Очищаємо попередні логи
-            document.getElementById('console-output').innerHTML = '';
+    // Очищаємо попередні логи
+    document.getElementById('console-output').innerHTML = '';
 
-            const file = fileInput.files[0];
+    const file = fileInput.files[0];
 
-            if (!file) {
-                showStatus('Виберіть файл для конвертації', 'error');
-                return;
-            }
+    if (!file) {
+        showStatus('Виберіть файл для конвертації', 'error');
+        return;
+    }
 
-            // Визначаємо тип файлу
-            const fileType = file.name.split('.').pop().toLowerCase();
-            if (fileType !== 'html' && fileType !== 'htm' && fileType !== 'pdf') {
-                showStatus('Підтримуються лише HTML та PDF файли', 'error');
-                return;
-            }
+    // Визначаємо тип файлу
+    const fileType = file.name.split('.').pop().toLowerCase();
+    if (fileType !== 'html' && fileType !== 'htm' && fileType !== 'pdf') {
+        showStatus('Підтримуються лише HTML та PDF файли', 'error');
+        return;
+    }
 
-            // Показуємо статус завантаження і блокуємо кнопку
-            showStatus('Конвертація файлу, будь ласка, зачекайте...', 'loading');
-            convertButton.disabled = true;
+    // Показуємо статус завантаження і блокуємо кнопку
+    showStatus('Конвертація файлу, будь ласка, зачекайте...', 'loading');
+    convertButton.disabled = true;
 
-            log(`Початок конвертації файлу: ${file.name} (${formatFileSize(file.size)})`);
-            log(`Тип файлу: ${fileType}, Версія SCORM: ${scormVersion}`);
+    log(`Початок конвертації файлу: ${file.name} (${formatFileSize(file.size)})`);
+    log(`Тип файлу: ${fileType}, Версія SCORM: ${scormVersion}`);
 
-            // Зчитуємо файл
-            const reader = new FileReader();
-            reader.onload = async function(e) {
+    // Зчитуємо файл
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const base64Content = e.target.result.split(',')[1];
+            log(`Файл успішно прочитано, розмір base64: ${formatFileSize(base64Content.length)}`);
+
+            // Вивід шляху для діагностики
+            log(`Відправляємо запит на: /api/convert`);
+
+            const startTime = performance.now();
+
+            // Відправляємо запит на сервер
+            const response = await fetch('/api/convert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    file_type: fileType,
+                    file_name: file.name.replace(/\.[^/.]+$/, ""),
+                    file_content: base64Content,
+                    title: titleInput.value || file.name.replace(/\.[^/.]+$/, ""),
+                    scorm_version: scormVersion
+                })
+            });
+
+            const elapsedTime = ((performance.now() - startTime) / 1000).toFixed(2);
+            log(`Отримано відповідь від сервера (${elapsedTime}с), статус: ${response.status}`);
+
+            // Клонуємо відповідь, щоб можна було прочитати її тіло двічі
+            const clonedResponse = response.clone();
+
+            if (!response.ok) {
+                // Спроба отримати текст помилки - використовуємо клоновану копію
+                let errorText;
                 try {
-                    const base64Content = e.target.result.split(',')[1];
-                    log(`Файл успішно прочитано, розмір base64: ${formatFileSize(base64Content.length)}`);
-
-                    // Вивід шляху для діагностики
-                    log(`Відправляємо запит на: /api/convert`);
-
-                    const startTime = performance.now();
-
-                    // Відправляємо запит на сервер
-                    const response = await fetch('/api/convert', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            file_type: fileType,
-                            file_name: file.name.replace(/\.[^/.]+$/, ""),
-                            file_content: base64Content,
-                            title: titleInput.value || file.name.replace(/\.[^/.]+$/, ""),
-                            scorm_version: scormVersion
-                        })
-                    });
-
-                    const elapsedTime = ((performance.now() - startTime) / 1000).toFixed(2);
-                    log(`Отримано відповідь від сервера (${elapsedTime}с), статус: ${response.status}`);
-
-                    if (!response.ok) {
-                        // Спроба отримати текст помилки
-                        let errorText;
-                        try {
-                            const errorData = await response.json();
-                            errorText = errorData.error || 'Невідома помилка';
-                        } catch (e) {
-                            errorText = await response.text() || `HTTP помилка! статус: ${response.status}`;
-                        }
-                        throw new Error(errorText);
-                    }
-
-                    const result = await response.json();
-                    log(`Відповідь API: ${result.success ? 'Успішно' : 'Помилка'}`, result.success ? 'success' : 'error');
-
-                    if (result.success) {
-                        const packageSize = result.scorm_package ? formatFileSize(result.scorm_package.length * 0.75) : 'невідомо';
-                        log(`Отримано SCORM-пакет, розмір: ${packageSize}`, 'success');
-
-                        // Створюємо посилання для завантаження
-                        const downloadLink = document.createElement('a');
-                        downloadLink.href = 'data:application/zip;base64,' + result.scorm_package;
-                        downloadLink.download = result.file_name;
-
-                        // Додаємо до документа і клікаємо
-                        document.body.appendChild(downloadLink);
-                        downloadLink.click();
-                        document.body.removeChild(downloadLink);
-
-                        showStatus('Конвертація успішна! Завантаження SCORM-пакету розпочато.', 'success');
-                    } else {
-                        log(`Помилка конвертації: ${result.error || 'Невідома помилка'}`, 'error');
-                        showStatus('Помилка конвертації: ' + (result.error || 'Невідома помилка'), 'error');
-                    }
-                } catch (error) {
-                    log(`Помилка: ${error.message}`, 'error');
-                    showStatus('Помилка: ' + error.message, 'error');
-                } finally {
-                    // Розблоковуємо кнопку в будь-якому випадку
-                    convertButton.disabled = false;
+                    // Спробуємо спочатку отримати JSON
+                    const errorData = await clonedResponse.json();
+                    errorText = errorData.error || 'Невідома помилка';
+                } catch (e) {
+                    // Якщо не можемо отримати JSON, прочитаємо як звичайний текст
+                    errorText = await response.text() || `HTTP помилка! статус: ${response.status}`;
                 }
-            };
 
-            reader.onerror = function() {
-                log('Помилка читання файлу', 'error');
-                showStatus('Помилка читання файлу', 'error');
-                convertButton.disabled = false;
-            };
+                log(`API відповідь з помилкою: ${errorText}`, 'error');
+                throw new Error(errorText);
+            }
 
-            reader.readAsDataURL(file);
+            // Читаємо успішну відповідь
+            const result = await response.json();
+            log(`Відповідь API: ${result.success ? 'Успішно' : 'Помилка'}`, result.success ? 'success' : 'error');
+
+            if (result.success) {
+                const packageSize = result.scorm_package ? formatFileSize(result.scorm_package.length * 0.75) : 'невідомо';
+                log(`Отримано SCORM-пакет, розмір: ${packageSize}`, 'success');
+
+                // Створюємо посилання для завантаження
+                const downloadLink = document.createElement('a');
+                downloadLink.href = 'data:application/zip;base64,' + result.scorm_package;
+                downloadLink.download = result.file_name;
+
+                // Додаємо до документа і клікаємо
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+
+                showStatus('Конвертація успішна! Завантаження SCORM-пакету розпочато.', 'success');
+            } else {
+                log(`Помилка конвертації: ${result.error || 'Невідома помилка'}`, 'error');
+                showStatus('Помилка конвертації: ' + (result.error || 'Невідома помилка'), 'error');
+            }
+        } catch (error) {
+            log(`Помилка: ${error.message}`, 'error');
+            showStatus('Помилка: ' + error.message, 'error');
+        } finally {
+            // Розблоковуємо кнопку в будь-якому випадку
+            convertButton.disabled = false;
         }
+    };
+
+    reader.onerror = function() {
+        log('Помилка читання файлу', 'error');
+        showStatus('Помилка читання файлу', 'error');
+        convertButton.disabled = false;
+    };
+
+    reader.readAsDataURL(file);
+}
 
         function showStatus(message, type) {
             const statusDiv = document.getElementById('status');
