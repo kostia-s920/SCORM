@@ -2525,7 +2525,7 @@ def main():
 
         # Збираємо список файлів у поточній директорії
         supported_extensions = ('.html', '.htm', '.zip', '.scorm')
-        current_files = [f for f in os.listdir('.') if os.path.isfile(f) and
+        current_files = [f for f in os.listdir('') if os.path.isfile(f) and
                          f.lower().endswith(supported_extensions)]
 
         if current_files:

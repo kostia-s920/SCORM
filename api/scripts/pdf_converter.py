@@ -1646,7 +1646,7 @@ def main():
         print("Цей скрипт конвертує PDF файли в SCORM-пакети\n")
 
         # Збираємо список файлів у поточній директорії
-        pdf_files = [f for f in os.listdir('.') if os.path.isfile(f) and
+        pdf_files = [f for f in os.listdir('') if os.path.isfile(f) and
                      f.lower().endswith('.pdf')]
 
         if pdf_files:

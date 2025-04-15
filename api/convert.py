@@ -1,9 +1,7 @@
 from http.server import BaseHTTPRequestHandler
 import json
-import os
 import tempfile
 import base64
-import sys
 
 import sys
 import os
@@ -18,8 +16,8 @@ sys.path.append(scripts_dir)
 
 # Тепер імпортуємо модулі з директорії scripts
 
-from scripts.html_converter import convert_html_to_scorm
-from scripts.pdf_converter import convert_pdf_to_scorm
+from api.scripts.html_converter import convert_html_to_scorm
+from api.scripts.pdf_converter import convert_pdf_to_scorm
 
 
 
