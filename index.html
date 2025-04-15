@@ -16,6 +16,15 @@
             border-radius: 10px;
             background-color: #f8f9fa;
         }
+        #downloadContainer {
+            margin-top: 20px;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -27,13 +36,15 @@
                 <div class="converter-section">
                     <h2>HTML → SCORM</h2>
                     <p>Конвертація HTML файлу в SCORM пакет.</p>
-                        <div class="mb-3">
-                            <label for="htmlFile" class="form-label">Виберіть HTML файл:</label>
-                        </div>
-                        <div class="mb-3">
-                            <label for="htmlTitle" class="form-label">Назва курсу:</label>
-                        </div>
-                        <button type="button" class="btn btn-primary" id="convertHtmlBtn">Конвертувати HTML</button>
+                    <div class="mb-3">
+                        <label for="htmlFile" class="form-label">Виберіть HTML файл:</label>
+                        <input class="form-control" type="file" id="htmlFile" accept=".html,.htm">
+                    </div>
+                    <div class="mb-3">
+                        <label for="htmlTitle" class="form-label">Назва курсу:</label>
+                        <input type="text" class="form-control" id="htmlTitle" placeholder="Введіть назву курсу">
+                    </div>
+                    <button type="button" class="btn btn-primary" id="convertHtmlBtn">Конвертувати HTML</button>
                 </div>
             </div>
 
@@ -41,13 +52,15 @@
                 <div class="converter-section">
                     <h2>PDF → SCORM</h2>
                     <p>Конвертація PDF файлу в SCORM пакет.</p>
-                        <div class="mb-3">
-                            <label for="pdfFile" class="form-label">Виберіть PDF файл:</label>
-                        </div>
-                        <div class="mb-3">
-                            <label for="pdfTitle" class="form-label">Назва курсу:</label>
-                        </div>
-                        <button type="button" class="btn btn-primary" id="convertPdfBtn">Конвертувати PDF</button>
+                    <div class="mb-3">
+                        <label for="pdfFile" class="form-label">Виберіть PDF файл:</label>
+                        <input class="form-control" type="file" id="pdfFile" accept=".pdf">
+                    </div>
+                    <div class="mb-3">
+                        <label for="pdfTitle" class="form-label">Назва курсу:</label>
+                        <input type="text" class="form-control" id="pdfTitle" placeholder="Введіть назву курсу">
+                    </div>
+                    <button type="button" class="btn btn-primary" id="convertPdfBtn">Конвертувати PDF</button>
                 </div>
             </div>
         </div>
@@ -68,15 +81,170 @@
                 </div>
             </div>
         </div>
+
+        <div class="footer">
+            <p>Конвертер дозволяє перетворювати HTML та PDF файли в SCORM пакети для систем LMS.</p>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('convertHtmlBtn').addEventListener('click', function() {
+            const htmlFile = document.getElementById('htmlFile');
+            const htmlTitle = document.getElementById('htmlTitle');
+            const convertHtmlBtn = document.getElementById('convertHtmlBtn');
+
+            const pdfFile = document.getElementById('pdfFile');
+            const pdfTitle = document.getElementById('pdfTitle');
+            const convertPdfBtn = document.getElementById('convertPdfBtn');
+
+            const progressBar = document.getElementById('progressBar');
+            const statusOutput = document.getElementById('statusOutput');
+            const downloadContainer = document.getElementById('downloadContainer');
+            const downloadLink = document.getElementById('downloadLink');
+
+            // Функція для оновлення прогресу
+            function updateProgress(percent) {
+                progressBar.style.width = percent + '%';
+                progressBar.setAttribute('aria-valuenow', percent);
+                progressBar.textContent = percent + '%';
+            }
+
+            // Функція для оновлення статусу
+            function updateStatus(message, type = 'info') {
+                statusOutput.className = 'alert alert-' + type;
+                statusOutput.textContent = message;
+            }
+
+            // Функція для показу посилання на завантаження
+            function showDownloadLink(url, filename) {
+                downloadLink.href = url;
+                downloadLink.download = filename || 'scorm_package.zip';
+                downloadContainer.style.display = 'block';
+            }
+
+            // Функція для конвертації file в base64
+            function fileToBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => {
+                        const base64 = reader.result.split(',')[1]; // Отримуємо base64 без заголовка
+                        resolve(base64);
+                    };
+                    reader.onerror = error => reject(error);
+                });
+            }
+
+            // Функція для конвертації base64 в Blob
+            function base64ToBlob(base64, mimeType) {
+                const byteCharacters = atob(base64);
+                const byteArrays = [];
+
+                for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                    const slice = byteCharacters.slice(offset, offset + 512);
+
+                    const byteNumbers = new Array(slice.length);
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+
+                    const byteArray = new Uint8Array(byteNumbers);
+                    byteArrays.push(byteArray);
+                }
+
+                return new Blob(byteArrays, {type: mimeType});
+            }
+
+            // Функція для конвертації файлів
+            async function convertFile(endpoint, file, title) {
+                updateStatus('Початок конвертації...', 'info');
+                updateProgress(10);
+
+                try {
+                    // Конвертуємо файл в base64
+                    const fileContent = await fileToBase64(file);
+                    updateProgress(30);
+
+                    // Відправляємо запит на сервер
+                    const response = await fetch(`/api/${endpoint}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            fileContent: fileContent,
+                            title: title
+                        })
+                    });
+
+                    updateProgress(70);
+
+                    // Перевіряємо відповідь
+                    if (!response.ok) {
+                        let errorText = 'Помилка сервера';
+                        try {
+                            const errorData = await response.json();
+                            errorText = errorData.error || errorText;
+                        } catch (e) {
+                            // Ігноруємо помилки розбору JSON
+                        }
+                        throw new Error(errorText);
+                    }
+
+                    // Отримуємо результат
+                    const result = await response.json();
+                    updateProgress(90);
+
+                    // Створюємо посилання для завантаження
+                    const blob = base64ToBlob(result.content, 'application/zip');
+                    const url = URL.createObjectURL(blob);
+
+                    updateProgress(100);
+                    updateStatus('Файл успішно конвертовано!', 'success');
+                    showDownloadLink(url, result.filename);
+
+                } catch (error) {
+                    console.error('Помилка:', error);
+                    updateStatus('Помилка конвертації: ' + error.message, 'danger');
+                    updateProgress(0);
+                }
+            }
+
+            // Обробник події для конвертації HTML
+            convertHtmlBtn.addEventListener('click', async function() {
+                // Перевірка, чи вибрано файл
+                if (!htmlFile.files.length) {
+                    updateStatus('Будь ласка, виберіть HTML файл', 'warning');
+                    return;
+                }
+
+                const file = htmlFile.files[0];
+                const title = htmlTitle.value || 'SCORM Курс';
+
+                // Сховати посилання на попередній файл, якщо воно було
+                downloadContainer.style.display = 'none';
+
+                // Викликаємо функцію конвертації
+                await convertFile('convert-html', file, title);
             });
 
-            document.getElementById('convertPdfBtn').addEventListener('click', function() {
+            // Обробник події для конвертації PDF
+            convertPdfBtn.addEventListener('click', async function() {
+                // Перевірка, чи вибрано файл
+                if (!pdfFile.files.length) {
+                    updateStatus('Будь ласка, виберіть PDF файл', 'warning');
+                    return;
+                }
+
+                const file = pdfFile.files[0];
+                const title = pdfTitle.value || 'SCORM Курс';
+
+                // Сховати посилання на попередній файл, якщо воно було
+                downloadContainer.style.display = 'none';
+
+                // Викликаємо функцію конвертації
+                await convertFile('convert-pdf', file, title);
             });
         });
     </script>

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Основи SEO: Навчальний курс</title>
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.2em;
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 40px;
+            font-size: 1.8em;
+        }
+        h3 {
+            color: #2980b9;
+            margin-top: 30px;
+            font-size: 1.4em;
+        }
+        p, li {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+        .lesson {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .info-box {
+            background-color: #e8f4fc;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .warning-box {
+            background-color: #fff5e6;
+            border-left: 4px solid #e67e22;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .quiz-container {
+            background-color: #f1f8ff;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .quiz-question {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        .quiz-options {
+            margin-bottom: 20px;
+        }
+        .quiz-option {
+            margin: 10px 0;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            transition: background-color 0.3s;
+        }
+        .quiz-option:hover {
+            background-color: #e3f2fd;
+        }
+        .selected {
+            background-color: #bbdefb;
+            border-color: #64b5f6;
+        }
+        .correct {
+            background-color: #c8e6c9;
+            border-color: #66bb6a;
+        }
+        .incorrect {
+            background-color: #ffcdd2;
+            border-color: #e57373;
+        }
+        .feedback {
+            display: none;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .feedback.correct {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+        }
+        .feedback.incorrect {
+            background-color: #ffcdd2;
+            color: #c62828;
+        }
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .progress-container {
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            width: 100%;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background-color: #2ecc71;
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        #completion-certificate {
+            display: none;
+            background-color: #f9f9f9;
+            border: 2px dashed #2c3e50;
+            padding: 30px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        #completion-certificate h2 {
+            color: #2c3e50;
+            border-bottom: none;
+        }
+        #completion-certificate p {
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        .certificate-seal {
+            width: 100px;
+            height: 100px;
+            margin: 20px auto;
+            background-color: #e74c3c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.5em;
+            transform: rotate(-15deg);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Основи SEO: Навчальний курс</h1>
+        <p>Вивчіть основи пошукової оптимізації сайтів</p>
+    </header>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar">0%</div>
+    </div>
+
+    <main>
+        <div class="lesson" id="lesson1">
+            <h2>Урок 1: Основи пошукової оптимізації</h2>
+
+            <h3>Що таке SEO?</h3>
+            <p>SEO (Search Engine Optimization) - це комплекс заходів для підвищення позицій веб-сайту в результатах пошукових систем за певними пошуковими запитами.</p>
+
+            <div class="info-box">
+                <p><strong>Ключовий факт:</strong> Згідно зі статистикою, більше 90% користувачів не переходять на другу сторінку результатів пошуку Google.</p>
+            </div>
+
+
+            <h3>Чому SEO важливе?</h3>
+            <p>Пошукова оптимізація допомагає:</p>
+            <ul>
+                <li>Збільшити органічний (безкоштовний) трафік на сайт</li>
+                <li>Підвищити впізнаваність бренду</li>
+                <li>Покращити довіру до сайту і бізнесу</li>
+                <li>Збільшити конверсії та продажі</li>
+            </ul>
+
+            <h3>Ключові компоненти SEO</h3>
+
+            <h4>1. Оптимізація на сторінці (On-page SEO)</h4>
+            <p>Це оптимізація елементів безпосередньо на вашому сайті:</p>
+            <ul>
+                <li><strong>Ключові слова</strong> - слова та фрази, за якими користувачі шукають інформацію</li>
+                <li><strong>Контент</strong> - якісний, релевантний текст на сторінках</li>
+                <li><strong>Meta-теги</strong> - title, description, заголовки h1-h6</li>
+                <li><strong>URL-структура</strong> - чіткі, зрозумілі адреси сторінок</li>
+                <li><strong>Внутрішні посилання</strong> - правильна структура посилань на сайті</li>
+            </ul>
+
+
+            <h4>2. Оптимізація поза сторінкою (Off-page SEO)</h4>
+            <p>Дії, які ви виконуєте за межами вашого сайту:</p>
+            <ul>
+                <li><strong>Зовнішні посилання</strong> - посилання з інших сайтів</li>
+                <li><strong>Соціальні сигнали</strong> - активність у соціальних мережах</li>
+                <li><strong>Згадки бренду</strong> - навіть без посилань</li>
+            </ul>
+
+            <h4>3. Технічне SEO</h4>
+            <p>Технічні аспекти, які впливають на індексацію та ранжування:</p>
+            <ul>
+                <li><strong>Швидкість завантаження</strong> - оптимізація швидкодії</li>
+                <li><strong>Мобільна адаптивність</strong> - коректне відображення на всіх пристроях</li>
+                <li><strong>Структура сайту</strong> - логічна архітектура</li>
+                <li><strong>XML-карта сайту</strong> - для кращої індексації</li>
+                <li><strong>Файл robots.txt</strong> - інструкції для пошукових роботів</li>
+            </ul>
+
+            <div class="warning-box">
+                <p><strong>Увага!</strong> Намагайтеся уникати "чорних" методів SEO (спам, прихований текст, маніпуляції посиланнями), які можуть призвести до штрафів від пошукових систем.</p>
+            </div>
+
+            <h3>Основні пошукові фактори</h3>
+            <p>Сучасні пошукові алгоритми враховують більше 200 факторів, серед найважливіших:</p>
+            <ul>
+                <li>Релевантність контенту запиту користувача</li>
+                <li>Якість і унікальність контенту</li>
+                <li>Поведінкові фактори (час на сайті, показник відмов)</li>
+                <li>Авторитетність домену (Domain Authority)</li>
+                <li>Безпека сайту (HTTPS)</li>
+                <li>Швидкість завантаження</li>
+                <li>Досвід користувачів на сайті (UX)</li>
+            </ul>
+
+            <!-- Тест для перевірки знань з першого уроку -->
+            <div class="quiz-container">
+                <h3>Перевірте свої знання</h3>
+
+                <div class="quiz-question">1. Що означає абревіатура SEO?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-correct="false">Site Engine Organization</div>
+                    <div class="quiz-option" data-correct="false">Social Environment Optimization</div>
+                    <div class="quiz-option" data-correct="true">Search Engine Optimization</div>
+                    <div class="quiz-option" data-correct="false">System Engineering Operation</div>
+                </div>
+                <div class="feedback"></div>
+
+                <div class="quiz-question">2. Яка складова НЕ відноситься до On-page SEO?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-correct="false">Оптимізація meta-тегів</div>
+                    <div class="quiz-option" data-correct="true">Отримання зовнішніх посилань</div>
+                    <div class="quiz-option" data-correct="false">Оптимізація заголовків h1-h6</div>
+                    <div class="quiz-option" data-correct="false">Оптимізація URL-структури</div>
+                </div>
+                <div class="feedback"></div>
+
+                <div class="quiz-question">3. Що з перерахованого є прикладом "чорного" SEO?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-correct="true">Прихований текст одного кольору з фоном</div>
+                    <div class="quiz-option" data-correct="false">Оптимізація швидкості завантаження сайту</div>
+                    <div class="quiz-option" data-correct="false">Використання rel="nofollow" для зовнішніх посилань</div>
+                    <div class="quiz-option" data-correct="false">Регулярне оновлення контенту</div>
+                </div>
+                <div class="feedback"></div>
+
+                <button class="btn" id="check-answers-1">Перевірити відповіді</button>
+            </div>
+
+            <div class="navigation">
+                <div></div>
+                <button class="btn" id="to-lesson-2">Перейти до уроку 2</button>
+            </div>
+        </div>
+
+        <div class="lesson" id="lesson2" style="display: none;">
+            <h2>Урок 2: Практичні інструменти та стратегії SEO</h2>
+
+            <h3>Дослідження ключових слів</h3>
+            <p>Дослідження ключових слів - це процес визначення пошукових термінів, які використовують ваші потенційні відвідувачі. Ефективна стратегія ключових слів є основою успішного SEO.</p>
+
+            <h4>Процес дослідження ключових слів:</h4>
+            <ol>
+                <li><strong>Мозковий штурм</strong> - запишіть всі слова та фрази, пов'язані з вашим бізнесом/темою</li>
+                <li><strong>Розширення списку</strong> - використовуйте інструменти для знаходження пов'язаних ключових слів</li>
+                <li><strong>Аналіз конкуренції</strong> - оцініть складність ранжування за обраними запитами</li>
+                <li><strong>Оцінка пошукового об'єму</strong> - визначте, скільки людей шукають ці терміни</li>
+                <li><strong>Оцінка комерційного потенціалу</strong> - визначте, які запити ведуть до конверсій</li>
+            </ol>
+
+
+            <h4>Інструменти для дослідження ключових слів:</h4>
+            <ul>
+                <li><strong>Google Keyword Planner</strong> - безкоштовний інструмент від Google</li>
+                <li><strong>Ahrefs Keywords Explorer</strong> - платний, але потужний інструмент</li>
+                <li><strong>SEMrush</strong> - професійний інструмент з широкими можливостями</li>
+                <li><strong>Ubersuggest</strong> - має безкоштовну версію з базовими функціями</li>
+                <li><strong>Answer the Public</strong> - візуалізує запитання користувачів</li>
+            </ul>
+
+            <div class="info-box">
+                <p><strong>Порада:</strong> Звертайте увагу на "довгий хвіст" ключових слів - більш довгі, специфічні фрази, які зазвичай мають меншу конкуренцію та вищу конверсію.</p>
+            </div>
+
+            <h3>Аналіз конкурентів</h3>
+            <p>Аналіз конкурентів допомагає зрозуміти їхні сильні сторони та виявити можливості для вашого сайту.</p>
+
+            <h4>Що аналізувати у конкурентів:</h4>
+            <ul>
+                <li><strong>Ключові слова</strong> - за якими запитами вони ранжуються</li>
+                <li><strong>Структуру контенту</strong> - формат, довжина, мультимедіа</li>
+                <li><strong>Внутрішню оптимізацію</strong> - заголовки, мета-теги, URL</li>
+                <li><strong>Профіль зовнішніх посилань</strong> - кількість, якість, джерела</li>
+                <li><strong>Користувацький досвід</strong> - дизайн, навігація, швидкість</li>
+            </ul>
+
+            <h3>Створення SEO-оптимізованого контенту</h3>
+            <p>Якісний контент є основою успішного SEO. Ось ключові принципи:</p>
+
+            <h4>Структура SEO-оптимізованого контенту:</h4>
+            <ol>
+                <li><strong>Привабливий заголовок (title)</strong> - містить основне ключове слово, приваблює увагу</li>
+                <li><strong>Мета-опис (meta description)</strong> - короткий опис сторінки з ключовими словами</li>
+                <li><strong>Вступ</strong> - захоплює увагу, містить основне ключове слово</li>
+                <li><strong>Підзаголовки (h2, h3, h4)</strong> - структурують контент, містять ключові слова</li>
+                <li><strong>Основний текст</strong> - якісний, інформативний, з правильним розміщенням ключових слів</li>
+                <li><strong>Зображення</strong> - з оптимізованими ALT-тегами</li>
+                <li><strong>Внутрішні посилання</strong> - на інші релевантні сторінки вашого сайту</li>
+                <li><strong>Заклик до дії</strong> - що користувач повинен зробити далі</li>
+            </ol>
+
+
+            <h4>Рекомендації щодо контенту:</h4>
+            <ul>
+                <li>Пишіть для людей, а не для пошукових систем</li>
+                <li>Створюйте вичерпний контент (1000+ слів для важливих сторінок)</li>
+                <li>Використовуйте ключові слова природно (уникайте перенасичення)</li>
+                <li>Структуруйте текст для зручності читання (короткі абзаци, списки)</li>
+                <li>Включайте актуальні дані, статистику, приклади</li>
+                <li>Використовуйте мультимедіа (зображення, відео, інфографіки)</li>
+                <li>Регулярно оновлюйте контент, щоб він залишався актуальним</li>
+            </ul>
+
+            <div class="warning-box">
+                <p><strong>Важливо:</strong> Уникайте дублювання контенту, який може негативно вплинути на ранжування вашого сайту.</p>
+            </div>
+
+            <h3>Технічне SEO та аудит сайту</h3>
+            <p>Технічна оптимізація забезпечує правильне індексування та покращує досвід користувачів.</p>
+
+            <h4>Ключові аспекти технічного SEO:</h4>
+            <ul>
+                <li><strong>Швидкість завантаження</strong> - оптимізація зображень, мінімізація коду</li>
+                <li><strong>Мобільна оптимізація</strong> - адаптивний дизайн</li>
+                <li><strong>HTTPS</strong> - безпечне з'єднання</li>
+                <li><strong>Правильна структура URL</strong> - зрозумілі, короткі адреси</li>
+                <li><strong>XML Sitemap</strong> - карта сайту для пошукових систем</li>
+                <li><strong>Robots.txt</strong> - правильні директиви для пошукових роботів</li>
+                <li><strong>Канонікалізація</strong> - вирішення проблем дублікатів сторінок</li>
+                <li><strong>Структура внутрішніх посилань</strong> - логічна навігація</li>
+            </ul>
+
+            <h4>Інструменти для технічного аудиту:</h4>
+            <ul>
+                <li><strong>Google Search Console</strong> - безкоштовний інструмент від Google</li>
+                <li><strong>Google PageSpeed Insights</strong> - аналіз швидкості завантаження</li>
+                <li><strong>Screaming Frog</strong> - сканер сайту для аудиту</li>
+                <li><strong>GTmetrix</strong> - аналіз продуктивності</li>
+                <li><strong>Ahrefs Site Audit</strong> - комплексний аудит</li>
+            </ul>
+
+            <h3>Відстеження результатів</h3>
+            <p>Регулярний моніторинг показників допоможе оцінити ефективність ваших SEO-зусиль та коригувати стратегію.</p>
+
+            <h4>Ключові показники для відстеження:</h4>
+            <ul>
+                <li><strong>Позиції в пошуку</strong> - ранжування за цільовими запитами</li>
+                <li><strong>Органічний трафік</strong> - кількість переходів з пошукових систем</li>
+                <li><strong>CTR (Click-Through Rate)</strong> - відсоток переходів із видачі</li>
+                <li><strong>Поведінкові фактори</strong> - час на сайті, показник відмов</li>
+                <li><strong>Конверсії</strong> - досягнення цільових дій</li>
+                <li><strong>Індексація</strong> - кількість проіндексованих сторінок</li>
+                <li><strong>Зовнішні посилання</strong> - кількість і якість беклінків</li>
+            </ul>
+
+            <div class="info-box">
+                <p><strong>Порада:</strong> Налаштуйте Google Analytics і Google Search Console для вашого сайту - це безкоштовні та потужні інструменти для відстеження багатьох важливих показників.</p>
+            </div>
+
+            <!-- Тест для перевірки знань з другого уроку -->
+            <div class="quiz-container">
+                <h3>Перевірте свої знання</h3>
+
+                <div class="quiz-question">1. Що таке "довгий хвіст" ключових слів?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-correct="false">Популярні ключові слова з високою частотою пошуку</div>
+                    <div class="quiz-option" data-correct="true">Довші, специфічні пошукові фрази з меншою конкуренцією</div>
+                    <div class="quiz-option" data-correct="false">Ключові слова, що складаються лише з іменників</div>
+                    <div class="quiz-option" data-correct="false">Запити, для яких потрібно довго чекати результатів пошуку</div>
+                </div>
+                <div class="feedback"></div>
+
+                <div class="quiz-question">2. Який з цих інструментів НЕ є офіційним інструментом Google для SEO?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-correct="false">Google Search Console</div>
+                    <div class="quiz-option" data-correct="false">Google Analytics</div>
+                    <div class="quiz-option" data-correct="false">Google PageSpeed Insights</div>
+                    <div class="quiz-option" data-correct="true">Ahrefs</div>
+                </div>
+                <div class="feedback"></div>
+
+                <div class="quiz-question">3. Що означає термін "канонікалізація" в технічному SEO?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-correct="false">Встановлення основної мови сайту</div>
+                    <div class="quiz-option" data-correct="false">Оптимізація швидкості завантаження</div>
+                    <div class="quiz-option" data-correct="true">Вказівка пошуковим системам на основну версію сторінки при наявності дублікатів</div>
+                    <div class="quiz-option" data-correct="false">Спосіб шифрування даних для захисту сайту</div>
+                </div>
+                <div class="feedback"></div>
+
+                <div class="quiz-question">4. Який елемент є найважливішим для SEO-оптимізованого контенту?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-correct="false">Використання ключових слів у кожному абзаці</div>
+                    <div class="quiz-option" data-correct="false">Наявність великої кількості зовнішніх посилань</div>
+                    <div class="quiz-option" data-correct="true">Якісний, інформативний контент, який відповідає запитам користувачів</div>
+                    <div class="quiz-option" data-correct="false">Використання максимальної кількості маркованих списків</div>
+                </div>
+                <div class="feedback"></div>
+
+                <button class="btn" id="check-answers-2">Перевірити відповіді</button>
+            </div>
+
+            <div class="navigation">
+                <button class="btn" id="to-lesson-1">Повернутися до уроку 1</button>
+                <button class="btn" id="complete-course">Завершити курс</button>
+            </div>
+        </div>
+
+        <div id="completion-certificate">
+            <h2>Сертифікат про проходження курсу</h2>
+            <p>Цим засвідчується, що</p>
+            <h3 id="student-name">Учасник курсу</h3>
+            <p>успішно завершив(ла) навчальний курс</p>
+            <h3>"Основи SEO: Навчальний курс"</h3>
+            <div class="certificate-seal">SEO</div>
+            <p id="completion-date">Дата: 14 квітня 2025</p>
+        </div>
+    </main>
+
+    <script>
+        // Функція для обробки відповідей на питання тесту
+        function setupQuiz(buttonId) {
+            const checkButton = document.getElementById(buttonId);
+            if (!checkButton) return;
+
+            checkButton.addEventListener('click', function() {
+                let correct = 0;
+                let total = 0;
+
+                // Знаходимо усі питання в поточному тесті
+                const quizContainer = this.closest('.quiz-container');
+                const questions = quizContainer.querySelectorAll('.quiz-question');
+
+                questions.forEach(function(question, index) {
+                    const optionsContainer = question.nextElementSibling;
+                    const options = optionsContainer.querySelectorAll('.quiz-option');
+                    const feedback = optionsContainer.nextElementSibling;
+
+                    let selectedOption = null;
+                    let correctOption = null;
+                    let isCorrect = false;
+
+                    options.forEach(function(option) {
+                        if (option.classList.contains('selected')) {
+                            selectedOption = option;
+                        }
+                        if (option.getAttribute('data-correct') === 'true') {
+                            correctOption = option;
+                        }
+                    });
+
+                    total++;
+
+                    // Перевіряємо, чи вибрана відповідь правильна
+                    if (selectedOption && selectedOption.getAttribute('data-correct') === 'true') {
+                        isCorrect = true;
+                        correct++;
+                        selectedOption.classList.add('correct');
+                        feedback.textContent = "Правильно!";
+                        feedback.className = "feedback correct";
+                    } else if (selectedOption) {
+                        selectedOption.classList.add('incorrect');
+                        correctOption.classList.add('correct');
+                        feedback.textContent = "Неправильно. Правильна відповідь: " + correctOption.textContent;
+                        feedback.className = "feedback incorrect";
+                    } else {
+                        feedback.textContent = "Ви не обрали відповідь. Правильна відповідь: " + correctOption.textContent;
+                        feedback.className = "feedback incorrect";
+                        correctOption.classList.add('correct');
+                    }
+
+                    feedback.style.display = "block";
+                });
+
+                // Оновлюємо прогрес
+                updateProgress();
+
+                // Показуємо результат
+                alert(`Ви відповіли правильно на ${correct} з ${total} питань!`);
+            });
+        }
+
+        // Додаємо можливість вибирати варіанти відповідей
+        function setupOptions() {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(function(option) {
+                option.addEventListener('click', function() {
+                    // Знімаємо виділення з інших опцій у цьому питанні
+                    const siblings = this.parentElement.querySelectorAll('.quiz-option');
+                    siblings.forEach(function(sibling) {
+                        sibling.classList.remove('selected');
+                    });
+
+                    // Виділяємо обрану опцію
+                    this.classList.add('selected');
+                });
+            });
+        }
+
+        // Навігація між уроками
+        function setupNavigation() {
+            const toLesson2 = document.getElementById('to-lesson-2');
+            const toLesson1 = document.getElementById('to-lesson-1');
+            const completeCourse = document.getElementById('complete-course');
+
+            if (toLesson2) {
+                toLesson2.addEventListener('click', function() {
+                    document.getElementById('lesson1').style.display = 'none';
+                    document.getElementById('lesson2').style.display = 'block';
+                    window.scrollTo(0, 0);
+                });
+            }
+
+            if (toLesson1) {
+                toLesson1.addEventListener('click', function() {
+                    document.getElementById('lesson2').style.display = 'none';
+                    document.getElementById('lesson1').style.display = 'block';
+                    window.scrollTo(0, 0);
+                });
+            }
+
+            if (completeCourse) {
+                completeCourse.addEventListener('click', function() {
+                    // Показуємо сертифікат
+                    document.getElementById('lesson2').style.display = 'none';
+                    document.getElementById('completion-certificate').style.display = 'block';
+
+                    // Запитуємо ім'я користувача для сертифікату
+                    const studentName = prompt("Введіть ваше ім'я для сертифікату:", "");
+                    if (studentName) {
+                        document.getElementById('student-name').textContent = studentName;
+                    }
+
+                    // Встановлюємо прогрес на 100%
+                    const progressBar = document.getElementById('progress-bar');
+                    progressBar.style.width = '100%';
+                    progressBar.textContent = '100%';
+
+                    window.scrollTo(0, 0);
+                });
+            }
+        }
+
+        // Оновлення прогресу
+        function updateProgress() {
+            // Спрощена логіка:
+            // - Якщо перейшли до 2-го уроку = 50%
+            // - Якщо відповіли на тести в 1-му уроці = +25%
+            // - Якщо відповіли на тести в 2-му уроці = +25%
+
+            let progress = 0;
+
+            // Перевіряємо, чи відповіли на тести в 1-му уроці
+            const quiz1Options = document.querySelectorAll('#lesson1 .quiz-option');
+            let answered1 = false;
+            quiz1Options.forEach(function(option) {
+                if (option.classList.contains('correct') || option.classList.contains('incorrect')) {
+                    answered1 = true;
+                }
+            });
+
+            if (answered1) {
+                progress += 25;
+            }
+
+            // Перевіряємо, чи перейшли до 2-го уроку
+            if (document.getElementById('lesson2').style.display === 'block') {
+                progress += 50;
+
+                // Перевіряємо, чи відповіли на тести в 2-му уроці
+                const quiz2Options = document.querySelectorAll('#lesson2 .quiz-option');
+                let answered2 = false;
+                quiz2Options.forEach(function(option) {
+                    if (option.classList.contains('correct') || option.classList.contains('incorrect')) {
+                        answered2 = true;
+                    }
+                });
+
+                if (answered2) {
+                    progress += 25;
+                }
+            }
+
+            // Оновлюємо прогрес-бар
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = progress + '%';
+        }
+
+        // Ініціалізація при завантаженні сторінки
+        window.onload = function() {
+            setupQuiz('check-answers-1');
+            setupQuiz('check-answers-2');
+            setupOptions();
+            setupNavigation();
+
+            // Встановлюємо початковий прогрес
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+        };
+    </script>
+</body>
+</html>
