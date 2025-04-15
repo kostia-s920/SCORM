@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCORM Конвертер</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+        .converter-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">SCORM Конвертер</h1>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="converter-section">
+                    <h2>HTML → SCORM</h2>
+                    <p>Конвертація HTML файлу в SCORM пакет.</p>
+                    <form id="htmlForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="htmlFile" class="form-label">Виберіть HTML файл:</label>
+                            <input class="form-control" type="file" id="htmlFile" name="file" accept=".html,.htm">
+                        </div>
+                        <div class="mb-3">
+                            <label for="htmlTitle" class="form-label">Назва курсу:</label>
+                            <input type="text" class="form-control" id="htmlTitle" name="title" placeholder="Введіть назву курсу">
+                        </div>
+                        <button type="button" class="btn btn-primary" id="convertHtmlBtn">Конвертувати HTML</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="converter-section">
+                    <h2>PDF → SCORM</h2>
+                    <p>Конвертація PDF файлу в SCORM пакет.</p>
+                    <form id="pdfForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="pdfFile" class="form-label">Виберіть PDF файл:</label>
+                            <input class="form-control" type="file" id="pdfFile" name="file" accept=".pdf">
+                        </div>
+                        <div class="mb-3">
+                            <label for="pdfTitle" class="form-label">Назва курсу:</label>
+                            <input type="text" class="form-control" id="pdfTitle" name="title" placeholder="Введіть назву курсу">
+                        </div>
+                        <button type="button" class="btn btn-primary" id="convertPdfBtn">Конвертувати PDF</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="converter-section">
+                    <h2>Статус конвертації</h2>
+                    <div class="mb-3">
+                        <div class="progress" style="height: 25px;">
+                            <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                        </div>
+                    </div>
+                    <div id="statusOutput" class="alert alert-info">Готовий до конвертації файлів.</div>
+                    <div id="downloadContainer" class="mt-3" style="display:none;">
+                        <a id="downloadLink" class="btn btn-success" href="#" download>Завантажити SCORM пакет</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const htmlForm = document.getElementById('htmlForm');
+            const pdfForm = document.getElementById('pdfForm');
+            const statusOutput = document.getElementById('statusOutput');
+            const progressBar = document.getElementById('progressBar');
+            const downloadContainer = document.getElementById('downloadContainer');
+            const downloadLink = document.getElementById('downloadLink');
+
+            function updateProgress(percent) {
+                progressBar.style.width = percent + '%';
+                progressBar.setAttribute('aria-valuenow', percent);
+                progressBar.textContent = percent + '%';
+            }
+
+            function updateStatus(message, type = 'info') {
+                statusOutput.className = 'alert alert-' + type;
+                statusOutput.textContent = message;
+            }
+
+            function showDownloadLink(url, filename) {
+                downloadLink.href = url;
+                downloadLink.download = filename;
+                downloadContainer.style.display = 'block';
+            }
+
+            // Функція для відправки файлу на сервер
+            async function convertFile(endpoint, formData) {
+                updateStatus('Початок конвертації...', 'info');
+                updateProgress(10);
+
+                try {
+                    // В реальному середовищі це було б:
+                    // const response = await fetch('/api/' + endpoint, {
+
+                    // Для демонстрації ми імітуємо процес:
+                    updateProgress(30);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    updateProgress(60);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    updateProgress(100);
+
+                    // Імітуємо успішну відповідь
+                    updateStatus('Файл успішно конвертовано! (Демо-режим)', 'success');
+                    showDownloadLink('#', 'demo_scorm.zip');
+                } catch (error) {
+                    updateStatus('Помилка конвертації: ' + error.message, 'danger');
+                    updateProgress(0);
+                }
+            }
+
+            // Обробники подій для кнопок конвертації
+            document.getElementById('convertHtmlBtn').addEventListener('click', function() {
+                const fileInput = document.getElementById('htmlFile');
+                const titleInput = document.getElementById('htmlTitle');
+
+                if (!fileInput.files.length) {
+                    updateStatus('Будь ласка, виберіть HTML файл', 'warning');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('title', titleInput.value || 'SCORM Курс');
+
+                convertFile('convert-html', formData);
+            });
+
+            document.getElementById('convertPdfBtn').addEventListener('click', function() {
+                const fileInput = document.getElementById('pdfFile');
+                const titleInput = document.getElementById('pdfTitle');
+
+                if (!fileInput.files.length) {
+                    updateStatus('Будь ласка, виберіть PDF файл', 'warning');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('title', titleInput.value || 'SCORM Курс');
+
+                convertFile('convert-pdf', formData);
+            });
+        });
+    </script>
+</body>
+</html>
