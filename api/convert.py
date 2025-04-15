@@ -13,6 +13,7 @@ def handler(request):
     except:
         return {
             "statusCode": 400,
+            "headers": {"Access-Control-Allow-Origin": "*"},
             "body": json.dumps({"error": "Invalid JSON"})
         }
 
@@ -27,48 +28,66 @@ def handler(request):
     except:
         return {
             "statusCode": 400,
+            "headers": {"Access-Control-Allow-Origin": "*"},
             "body": json.dumps({"error": "Invalid Base64 file"})
         }
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_type}") as temp_file:
-        temp_file.write(file_content)
-        input_path = temp_file.name
-
-    output_path = os.path.join(tempfile.gettempdir(), f"{file_name}_scorm.zip")
-
-    result = False
-    if file_type in ['html', 'htm']:
-        result = convert_html_to_scorm(input_path, output_path, title=title, scorm_version=scorm_version)
-    elif file_type == 'pdf':
-        result = convert_pdf_to_scorm(input_path, output_path, title=title, scorm_version=scorm_version)
-    else:
-        os.unlink(input_path)
+    if len(file_content) > 10 * 1024 * 1024:
         return {
             "statusCode": 400,
-            "body": json.dumps({"error": f"Unsupported file type: {file_type}"})
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({"error": "File too large. Max 10MB"})
         }
 
-    if not result or not os.path.exists(output_path):
-        os.unlink(input_path)
+    input_path = None
+    output_path = None
+
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_type}") as temp_file:
+            temp_file.write(file_content)
+            input_path = temp_file.name
+
+        output_path = os.path.join(tempfile.gettempdir(), f"{file_name}_scorm.zip")
+
+        result = False
+        if file_type in ['html', 'htm']:
+            result = convert_html_to_scorm(input_path, output_path, title=title, scorm_version=scorm_version)
+        elif file_type == 'pdf':
+            result = convert_pdf_to_scorm(input_path, output_path, title=title, scorm_version=scorm_version)
+        else:
+            return {
+                "statusCode": 400,
+                "headers": {"Access-Control-Allow-Origin": "*"},
+                "body": json.dumps({"error": f"Unsupported file type: {file_type}"})
+            }
+
+        if not result or not os.path.exists(output_path):
+            return {
+                "statusCode": 500,
+                "headers": {"Access-Control-Allow-Origin": "*"},
+                "body": json.dumps({"error": "SCORM generation failed"})
+            }
+
+        with open(output_path, 'rb') as f:
+            scorm_content = f.read()
+
+        scorm_base64 = base64.b64encode(scorm_content).decode('utf-8')
+
         return {
-            "statusCode": 500,
-            "body": json.dumps({"error": "SCORM generation failed"})
+            "statusCode": 200,
+            "headers": {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": json.dumps({
+                "success": True,
+                "scorm_package": scorm_base64,
+                "file_name": f"{file_name}_scorm.zip"
+            })
         }
 
-    with open(output_path, 'rb') as f:
-        scorm_content = f.read()
-
-    scorm_base64 = base64.b64encode(scorm_content).decode('utf-8')
-
-    os.unlink(input_path)
-    os.unlink(output_path)
-
-    return {
-        "statusCode": 200,
-        "headers": {"Content-Type": "application/json"},
-        "body": json.dumps({
-            "success": True,
-            "scorm_package": scorm_base64,
-            "file_name": f"{file_name}_scorm.zip"
-        })
-    }
+    finally:
+        if input_path and os.path.exists(input_path):
+            os.unlink(input_path)
+        if output_path and os.path.exists(output_path):
+            os.unlink(output_path)
