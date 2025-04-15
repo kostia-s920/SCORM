@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCORM Конвертер</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .loading {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <h1>SCORM Конвертер</h1>
+    <div class="container">
+        <div class="form-group">
+            <label for="file-input">Виберіть файл (HTML або PDF):</label>
+            <input type="file" id="file-input" accept=".html,.htm,.pdf">
+        </div>
+        <div class="form-group">
+            <label for="title-input">Назва курсу:</label>
+            <input type="text" id="title-input" placeholder="Назва курсу">
+        </div>
+        <div class="form-group">
+            <label for="scorm-version">Версія SCORM:</label>
+            <select id="scorm-version">
+                <option value="2004">SCORM 2004</option>
+                <option value="1.2">SCORM 1.2</option>
+            </select>
+        </div>
+        <button onclick="convertFile()">Конвертувати</button>
+    </div>
+    <div id="status" style="display: none;"></div>
+
+    <script>
+        async function convertFile() {
+            const fileInput = document.getElementById('file-input');
+            const titleInput = document.getElementById('title-input');
+            const scormVersion = document.getElementById('scorm-version').value;
+            const statusDiv = document.getElementById('status');
+
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showStatus('Виберіть файл для конвертації', 'error');
+                return;
+            }
+
+            // Визначаємо тип файлу
+            const fileType = file.name.split('.').pop().toLowerCase();
+            if (fileType !== 'html' && fileType !== 'htm' && fileType !== 'pdf') {
+                showStatus('Підтримуються лише HTML та PDF файли', 'error');
+                return;
+            }
+
+            // Показуємо статус завантаження
+            showStatus('Конвертація файлу, будь ласка, зачекайте...', 'loading');
+
+            // Зчитуємо файл
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const base64Content = e.target.result.split(',')[1];
+
+                    // Відправляємо запит на сервер
+                    const response = await fetch('/api/convert', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            file_type: fileType,
+                            file_name: file.name.replace(/\.[^/.]+$/, ""),
+                            file_content: base64Content,
+                            title: titleInput.value || file.name.replace(/\.[^/.]+$/, ""),
+                            scorm_version: scormVersion
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Створюємо посилання для завантаження
+                        const downloadLink = document.createElement('a');
+                        downloadLink.href = 'data:application/zip;base64,' + result.scorm_package;
+                        downloadLink.download = result.file_name;
+
+                        // Додаємо до документа і клікаємо
+                        document.body.appendChild(downloadLink);
+                        downloadLink.click();
+                        document.body.removeChild(downloadLink);
+
+                        showStatus('Конвертація успішна! Завантаження SCORM-пакету розпочато.', 'success');
+                    } else {
+                        showStatus('Помилка конвертації: ' + (result.error || 'Невідома помилка'), 'error');
+                    }
+                } catch (error) {
+                    showStatus('Помилка: ' + error.message, 'error');
+                }
+            };
+
+            reader.onerror = function() {
+                showStatus('Помилка читання файлу', 'error');
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = type;
+            statusDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
