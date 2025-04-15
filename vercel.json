@@ -5,7 +5,7 @@
     { "src": "*.html", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/api/convert", "dest": "/api/convert/index.py", "methods": ["POST", "OPTIONS"] },
+    { "src": "/api/convert", "dest": "/api/convert/index.py" },
     { "src": "/(.*)", "dest": "/$1" }
   ]
 }
