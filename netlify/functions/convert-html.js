@@ -61,7 +61,7 @@ exports.handler = async function(event, context) {
     return new Promise((resolve, reject) => {
       console.log(`Запуск команди: python ${scriptPath} ${htmlPath} --output ${outputPath} --title "${title}"`);
 
-      execFile('python', [
+      execFile('python3', [
         scriptPath,
         htmlPath,
         '--output', outputPath,
