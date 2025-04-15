@@ -5,10 +5,23 @@ import tempfile
 import base64
 import sys
 
-# Імпортуємо ваші конвертери
-sys.path.append('./scripts')  # додаємо шлях до ваших скриптів
-from html_converter import convert_html_to_scorm
-from pdf_converter import convert_pdf_to_scorm
+import sys
+import os
+
+# Визначаємо шлях до директорії scripts відносно поточного файлу
+current_dir = os.path.dirname(os.path.abspath(__file__))  # директорія api
+parent_dir = os.path.dirname(current_dir)                 # коренева директорія
+scripts_dir = os.path.join(parent_dir, "scripts")         # шлях до scripts
+
+# Додаємо шлях до scripts у sys.path
+sys.path.append(scripts_dir)
+
+# Тепер імпортуємо модулі з директорії scripts
+
+from scripts.html_converter import convert_html_to_scorm
+from scripts.pdf_converter import convert_pdf_to_scorm
+
+
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
