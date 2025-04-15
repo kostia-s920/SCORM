@@ -301,7 +301,7 @@
                     await convertFile('convert-pdf', file, title);
                 } catch (e) {
                     // Якщо виникла помилка (наприклад, API не налаштовано),
-                    // запускаємо демо-режим
+                    // запускаємо демо--режим
                     console.warn('Перехід в демо-режим через помилку:', e);
                     demoConvert('PDF', title);
                 }
