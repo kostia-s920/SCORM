@@ -4,6 +4,11 @@
     { "src": "api/*.py", "use": "@vercel/python" },
     { "src": "*.html", "use": "@vercel/static" }
   ],
+  "functions": {
+    "api/convert.py": {
+      "runtime": "python3.9"
+    }
+  },
   "routes": [
     { "src": "/api/(.*)", "dest": "api/$1" },
     { "src": "/(.*)", "dest": "/$1" }
