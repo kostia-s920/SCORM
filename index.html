@@ -175,12 +175,12 @@
             log(`Файл успішно прочитано, розмір base64: ${formatFileSize(base64Content.length)}`);
 
             // Вивід шляху для діагностики
-            log(`Відправляємо запит на: /api/convert`);
+            log(`Відправляємо запит на: /api/index`);
 
             const startTime = performance.now();
 
             // Відправляємо запит на сервер
-            const response = await fetch('/api/convert', {
+            const response = await fetch('/api/index', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
